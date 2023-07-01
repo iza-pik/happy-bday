@@ -1,10 +1,10 @@
 "use client";
 
 import { Input } from "@/components";
-import { createConfetto } from "@/components/Confetto";
+import { ConfettoType, createConfetto } from "@/components/Confetto";
 import { useEffect, useRef } from "react";
 
-let confetti = [];
+let confetti: ConfettoType[] = [];
 
 export default function Home() {
   const canvasEl = useRef(null);
@@ -15,6 +15,7 @@ export default function Home() {
     if (canvasEl && canvasEl.current) {
       const canvas = canvasEl.current as HTMLCanvasElement;
       const ctx = canvas.getContext("2d");
+      if (ctx === null) return;
       ctx?.clearRect(0, 0, canvas.width, canvas.height);
       const tmpConfetti = [];
       for (const confetto of confetti) {

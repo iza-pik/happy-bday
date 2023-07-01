@@ -1,4 +1,25 @@
+export interface ConfettoType {
+  cx: number;
+  cy: number;
+  vx: number;
+  vy: number;
+  radius: number;
+  colour: string;
+}
+
+interface ConfettiFactory {
+  new (
+    cx: number,
+    cy: number,
+    vx: number,
+    vy: number,
+    radius: number,
+    colour: string
+  ): ConfettoType;
+}
+
 export const Confetto = function (
+  this: ConfettoType,
   x: number,
   y: number,
   vx: number,
@@ -35,5 +56,6 @@ export const createConfetto = (width: number, height: number) => {
   const newVY = getRandomSpeed(height);
   const newRadius = 5;
   const newColour = `rgb(${getRandomColour()}, ${getRandomColour()}, ${getRandomColour()})`;
+  // @ts-ignore
   return new Confetto(newX, newY, newVX, newVY, newRadius, newColour);
 };
