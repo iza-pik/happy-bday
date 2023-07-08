@@ -1,4 +1,11 @@
-export const booms = [new Audio("assets/big-boom.mp3")];
+import "assets/big-boom.mp3";
+
+export const booms = [
+  new Audio("assets/big-boom.mp3"),
+  new Audio("assets/big-boom.mp3"),
+  new Audio("assets/big-boom.mp3"),
+  new Audio("assets/big-boom.mp3"),
+];
 export const bursts = [new Audio("assets/burst.mp3")];
 export const wooshes = [new Audio("assets/woosh.mp3")];
 

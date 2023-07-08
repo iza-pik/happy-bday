@@ -1,7 +1,13 @@
 "use client";
 
-import { Input } from "@/components";
-import { ConfettoType, createConfetto } from "@/components/Confetto";
+import { Input, Message } from "@/components";
+import {
+  ConfettoType,
+  createConfetto,
+  generateSpark,
+  getRandomNumber,
+} from "@/components/Confetto";
+import { boom } from "@/utils/audio";
 import { useEffect, useRef, useState } from "react";
 
 let confetti: ConfettoType[] = [];
@@ -9,6 +15,7 @@ let confetti: ConfettoType[] = [];
 export default function Home() {
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const canvasEl = useRef(null);
+  const ay = 2.5;
 
   useEffect(() => {
     const { width, height } = screen;
@@ -29,18 +36,23 @@ export default function Home() {
           ctx.fillStyle = colour;
           ctx.fill();
           ctx.closePath();
-          let newConfetto = { ...confetto, cx: cx + vx, cy: cy + vy };
+          confetto.tick(ay);
           // check if out of boundaries
           if (
-            newConfetto.cx > screen.width + radius ||
-            newConfetto.cx < -radius ||
-            newConfetto.cy > screen.height + radius ||
-            newConfetto.cy < -radius
+            confetto.cx > screen.width + radius ||
+            confetto.cx < -radius ||
+            confetto.cy > screen.height + radius ||
+            confetto.cy < -radius
           ) {
-            // generate a new one
-            newConfetto = createConfetto(screen.width, screen.height);
+            // TODO: reverse the condition
+          } else if (!confetto.ttl && !confetto.isSpark) {
+            const { cx, cy, colour } = confetto;
+            for (let i = 0, lmt = getRandomNumber(5) + 5; i < lmt; i++) {
+              tmpConfetti.push(generateSpark(cx, cy, colour, width, height));
+            }
+          } else {
+            tmpConfetti.push(confetto);
           }
-          tmpConfetti.push(newConfetto);
         }
         confetti = tmpConfetti;
       }
@@ -52,7 +64,8 @@ export default function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-between">
       <canvas {...dimensions} className="h-screen w-screen" ref={canvasEl} />
-      <Input />
+      {/* <Input /> */}
+      <Message />
     </main>
   );
 }
