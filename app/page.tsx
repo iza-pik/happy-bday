@@ -3,7 +3,7 @@
 import burst from "../assets/burst.mp3";
 import woosh from "../assets/woosh.mp3";
 import bigBoom from "../assets/big-boom.mp3";
-import { Input, Message, SoundButton } from "@/components";
+import { Message, SoundButton } from "@/components";
 import {
   FireworkType,
   MAX_FIREWORK_TRACE,
@@ -15,32 +15,39 @@ import { useEffect, useRef, useState } from "react";
 
 let fireworks: FireworkType[] = [];
 const MAX_FIREWORKS = 15;
-const sfx = [
-  Array.from({ length: MAX_FIREWORKS }, () => {
-    const audio = new Audio(burst);
-    audio.volume = 0.01;
-    return audio;
-  }),
-  Array.from({ length: MAX_FIREWORKS }, () => {
-    const audio = new Audio(woosh);
-    audio.playbackRate = 4;
-    audio.volume = 0.005;
-    return audio;
-  }),
-  Array.from({ length: MAX_FIREWORKS }, () => {
-    const audio = new Audio(bigBoom);
-    audio.volume = 0.01;
-    return audio;
-  }),
-];
+const sfx = Boolean(globalThis.window)
+  ? [
+      Array.from({ length: MAX_FIREWORKS }, () => {
+        const audio = new Audio(burst);
+        audio.volume = 0.01;
+        return audio;
+      }),
+      Array.from({ length: MAX_FIREWORKS }, () => {
+        const audio = new Audio(woosh);
+        audio.playbackRate = 4;
+        audio.volume = 0.005;
+        return audio;
+      }),
+      Array.from({ length: MAX_FIREWORKS }, () => {
+        const audio = new Audio(bigBoom);
+        audio.volume = 0.01;
+        return audio;
+      }),
+    ]
+  : [];
 
 let canvasAudioOn = false;
+let timeout = 0;
 
 export default function Home() {
-  const [dimensions, setDimensions] = useState({
-    width: screen.width,
-    height: screen.height,
-  });
+  const [dimensions, setDimensions] = useState(
+    !globalThis.window
+      ? { width: 1280, height: 720 }
+      : {
+          width: screen.width,
+          height: screen.height,
+        }
+  );
   const [isAudioOn, setIsAudioOn] = useState(false);
   const canvasEl = useRef(null);
   const ay = 0.18;
@@ -104,10 +111,30 @@ export default function Home() {
       }
       fireworks = tmpConfetti;
     }
-    setTimeout(draw, 8);
+    timeout = +setTimeout(draw, 8);
   };
 
-  useEffect(draw, []);
+  const onResize = () => {
+    setDimensions(
+      !globalThis.window
+        ? { width: 1280, height: 720 }
+        : {
+            width: window.innerWidth,
+            height: window.innerHeight,
+          }
+    );
+    clearTimeout(timeout);
+    draw();
+  };
+
+  useEffect(() => {
+    if (!global.window) return;
+    document.body.onresize = onResize;
+    onResize();
+    return () => {
+      document.body.onresize = null;
+    };
+  }, []);
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between">
