@@ -59,7 +59,7 @@ export const getRandomSpeed = (size: number, canBePositive = true) => {
 };
 
 export const getRandomTimeToLeave = () => {
-  return (Math.floor(Math.random() * 10) + 10) * 4;
+  return Math.floor(Math.random() * 40) + 40;
 };
 
 export const createFirework = (width: number, height: number) => {
