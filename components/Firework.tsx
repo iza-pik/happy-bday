@@ -1,4 +1,6 @@
-export interface ConfettoType {
+export const MAX_FIREWORK_TRACE = 4;
+
+export interface FireworkType {
   cx: number;
   cy: number;
   vx: number;
@@ -8,10 +10,11 @@ export interface ConfettoType {
   tick: (ay: number) => void;
   ttl: number;
   isSpark: boolean;
+  positions: number[][];
 }
 
-export const Confetto = function (
-  this: ConfettoType,
+export const Firework = function (
+  this: FireworkType,
   x: number,
   y: number,
   vx: number,
@@ -28,14 +31,17 @@ export const Confetto = function (
   this.radius = radius;
   this.colour = colour;
   this.tick = (ay: number) => {
+    this.positions.unshift([this.cx, this.cy]);
+    if (this.positions.length > MAX_FIREWORK_TRACE) this.positions.pop();
     this.cx += this.vx;
     this.cy += this.vy;
     this.vy += ay;
-    if (isSpark) this.radius *= 0.9;
+    if (isSpark) this.radius *= 0.98;
     else this.ttl--;
   };
   this.ttl = ttl;
   this.isSpark = isSpark;
+  this.positions = [];
 };
 
 export const getRandomColour = () => Math.floor(Math.random() * 256).toString();
@@ -46,16 +52,17 @@ export const getRandomNumber = (size: number) =>
 export const getRandomSpeed = (size: number, canBePositive = true) => {
   const onePercent = size / 100;
   return (
-    (canBePositive && Math.random() < 0.5 ? 1 : -1) *
-    (Math.floor(Math.random() * onePercent * 2) + onePercent)
+    ((canBePositive && Math.random() < 0.5 ? 1 : -1) *
+      (Math.floor(Math.random() * onePercent) + onePercent)) /
+    4
   );
 };
 
 export const getRandomTimeToLeave = () => {
-  return Math.floor(Math.random() * 10) + 10;
+  return (Math.floor(Math.random() * 10) + 10) * 4;
 };
 
-export const createConfetto = (width: number, height: number) => {
+export const createFirework = (width: number, height: number) => {
   const newX = width / 2;
   const newY = height;
   const newVX = getRandomSpeed(width);
@@ -64,7 +71,7 @@ export const createConfetto = (width: number, height: number) => {
   const newRadius = 5;
   const newColour = `rgb(${getRandomColour()}, ${getRandomColour()}, ${getRandomColour()})`;
   // @ts-ignore
-  return new Confetto(newX, newY, newVX, newVY, newRadius, newColour, newTtl);
+  return new Firework(newX, newY, newVX, newVY, newRadius, newColour, newTtl);
 };
 
 export const generateSpark = (
@@ -82,7 +89,7 @@ export const generateSpark = (
   const newRadius = 4;
   const newColour = colour;
   // @ts-ignore
-  return new Confetto(
+  return new Firework(
     newX,
     newY,
     newVX,

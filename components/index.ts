@@ -1,5 +1,5 @@
-import { Confetto } from "./Confetto";
-import { Input } from "./Input";
+import { Firework } from "./Firework";
 import { Message } from "./Message";
+import { SoundButton } from "./SoundButton";
 
-export { Confetto, Input, Message };
+export { Firework, Message, SoundButton };
